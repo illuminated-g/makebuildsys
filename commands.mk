@@ -34,6 +34,10 @@ define cc
 	@echo "    CC $(notdir $@)"
 	@mkdir -p $(BUILD_DIR)
 	$(quiet)  $(CC) -o $(BUILD_DIR)/$(subst .c,.o,$(notdir $^)) -c $(call local,$^)
+	@echo "    DEP $@"
+	$(quiet)$(CC) -MM $(call local,$^) -MF $(BUILD_DIR)/$*.d
+	$(quiet) buildtools/bin/fixdeps $(BUILD_DIR)/$*.d.tmp $(BUILD_DIR)/$*.d
+	$(rm) $(BUILD_DIR)/$*.d.tmp
 endef
 
 define cxx
@@ -41,8 +45,7 @@ define cxx
 	@mkdir -p $(BUILD_DIR)
 	$(quiet)  $(CXX) -o $(BUILD_DIR)/$(subst .cpp,.o,$(filter-out %.h,$(notdir $^))) -c $(filter-out %.a %.h,$(call local,$^))
 	@echo "    DEP $@"
-	$(quiet)$(CXX) -MM $(call local,$^) > $*.d
-	$(mv) $*.d $(BUILD_DIR)/$*.d.tmp
+	$(quiet)$(CXX) -MM $(call local,$^) -MF $(BUILD_DIR)/$*.d
 	$(quiet) buildtools/bin/fixdeps $(BUILD_DIR)/$*.d.tmp $(BUILD_DIR)/$*.d
 	$(rm) $(BUILD_DIR)/$*.d.tmp
 endef

@@ -1,4 +1,3 @@
-include flags.mk
 include commands.mk
 
 #even though this makefile is in the buildtools folder, it is executed in the
