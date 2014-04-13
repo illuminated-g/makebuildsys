@@ -18,17 +18,30 @@ clean:
 realclean: clean
 	$(rm) $(LIB_DIR)/* $(BIN_DIR)/*
 
+deps=$(wildcard $(BUILD_DIR)/*.d)
+
+ifneq ("$(deps)","")
+-include $(deps)
+endif
+
 #generic rules for working on individual target files
 %.o: %.c
 	$(cc)
-	
+
 %.o: %.cpp
 	$(cxx)
 
 %: %.o
 	$(ld)
 
-%: %.cpp
-
 %.a:
 	$(ar)
+
+#these are special rules to compile the tools used by this build system:
+all: buildtools/bin/fixdeps
+distclean: buildtools/bin/fixdeps
+distclean: realclean
+
+.PHONY: buildtools/bin/fixdeps
+buildtools/bin/fixdeps:
+	@$(MAKE) -s -f buildtools/buildtools.mk $(MAKECMDGOALS)

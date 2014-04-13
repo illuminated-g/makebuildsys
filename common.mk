@@ -1,4 +1,5 @@
-ifndef _common_mk_
+ifneq ("$(_common_mk_)", "1")
+#$(warning Including common functionality)
 export _common_mk_=1
 
 #functions to facilitate walking up directories
@@ -19,8 +20,12 @@ include $(srcroot)/commands.mk
 include $(srcroot)/dirs.mk
 include $(srcroot)/rules.mk
 
+ifndef NO_AVR
+
 #uncomment the following include to add support for AVR projects.
-#include $(srcroot)/avr.mk
+include $(srcroot)/avr.mk
+
+endif
 
 ifeq ("$(origin V)", "command line")
   VERBOSE=$(V)
@@ -32,7 +37,7 @@ endif
 ifeq ($(VERBOSE),1)
   quiet:=
 else
-  quiet:=@
+  export quiet:=@
   makeopts=--no-print-directory
 endif
 

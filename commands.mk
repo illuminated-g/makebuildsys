@@ -25,7 +25,7 @@ makeopts=
 make=@$(MAKE) $(makeopts)
 
 log=$(if $(quiet),,$(warning $1))
-local=$(subst $(CURDIR)/,,$1)
+local=$(subst $(CURDIR)/./,,$(subst ./,,$(subst $(CURDIR)/,,$1)))
 
 #These functions provide pretty output for build steps and optionally display
 #the full command used in the build step.
@@ -39,7 +39,12 @@ endef
 define cxx
 	@echo "    CXX $(notdir $@)"
 	@mkdir -p $(BUILD_DIR)
-	$(quiet)  $(CXX) -o $(BUILD_DIR)/$(subst .cpp,.o,$(notdir $^)) -c $(filter-out %.a,$(call local,$^))
+	$(quiet)  $(CXX) -o $(BUILD_DIR)/$(subst .cpp,.o,$(filter-out %.h,$(notdir $^))) -c $(filter-out %.a %.h,$(call local,$^))
+	@echo "    DEP $@"
+	$(quiet)$(CXX) -MM $(call local,$^) > $*.d
+	$(mv) $*.d $(BUILD_DIR)/$*.d.tmp
+	$(quiet) buildtools/bin/fixdeps $(BUILD_DIR)/$*.d.tmp $(BUILD_DIR)/$*.d
+	$(rm) $(BUILD_DIR)/$*.d.tmp
 endef
 
 define ld
@@ -55,3 +60,14 @@ define ar
 	@mkdir -p $(LIB_DIR)
 	$(cp) $(BUILD_DIR)/$@ $(LIB_DIR)
 endef
+
+#define depc
+#	@echo "    DEP $@"
+#	$(eval $@_D := $(BUILD_DIR)/$(subst .d,.c,$(^F)))
+#	$(eval $@_TMP := $(BUILD_DIR)/$(subst .d.tmp,.c,$(^F)))
+#	$(quiet)$(CC) -MM $(call local,$^) > $(eval $@_D)
+#	$(cp) -f $(eval $@_D) $(eval $@_TMP)
+#	$(quiet)sed -e 's/.*://' -e 's/\\$$//' < $(eval $@_TMP) | fmt -1 | \
+#	  sed -e 's/^ *//' -e 's/$$/:/' >> $(eval $@_D)
+#	$(rm) -f $(eval $@_TMP)
+#endef
