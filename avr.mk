@@ -24,7 +24,7 @@ CROSS_COMPILE= avr-
 
 define hex
 	@echo "    HEX $@"
-	$(quiet)  $(LD) -o $(BUILD_DIR)/$(subst .hex,.elf,$@) $(foreach file,$(call local,$^),$(BUILD_DIR)/$(notdir $(file)))
+	$(quiet)  $(LD) -mmcu=$(AVR_MCU) -o $(BUILD_DIR)/$(subst .hex,.elf,$@) $(foreach file,$(call local,$^),$(BUILD_DIR)/$(notdir $(file)))
 	$(quiet)  $(HEX) $(BUILD_DIR)/$(subst .hex,.elf,$@) $(BUILD_DIR)/$@
 	@mkdir -p $(BIN_DIR)
 	$(mv) $(BUILD_DIR)/$@ $(BIN_DIR)
