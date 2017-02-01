@@ -3,7 +3,7 @@
 
 CC=$(CROSS_COMPILE)gcc $(CFLAGS)
 CXX=$(CROSS_COMPILE)g++ $(CXXFLAGS)
-LD=$(CROSS_COMPILE)g++ $(LDFLAGS)
+LD=$(CROSS_COMPILE)g++
 AR=$(CROSS_COMPILE)ar $(ARFLAGS)
 HEX=$(CROSS_COMPILE)objcopy $(HEXFLAGS)
 AVRDUDE=avrdude
@@ -52,7 +52,7 @@ endef
 
 define ld
 	@echo "    LD $@"
-	$(quiet)  $(LD) -o $(BUILD_DIR)/$@ $(foreach file,$(call local,$^),$(BUILD_DIR)/$(notdir $(file)))
+	$(quiet)  $(LD) -o $(BUILD_DIR)/$@ $(foreach file,$(call local,$^),$(BUILD_DIR)/$(notdir $(file))) $(LDFLAGS)
 	@mkdir -p $(BIN_DIR)
 	$(mv) $(BUILD_DIR)/$@ $(BIN_DIR)
 endef

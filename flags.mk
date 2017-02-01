@@ -18,8 +18,8 @@ CLEANFILES+=*.o *~ *.a
 #   cam_test: cam_test.o
 
 .PHONY: opencv
-opencv: CXXFLAGS += `pkg-config opencv --cflags`
-opencv: LDFLAGS += `pkg-config opencv --libs`
+opencv: CXXFLAGS += $(shell pkg-config opencv --cflags)
+opencv: LDFLAGS += $(shell pkg-config opencv --libs)
 
 .PHONY: raspicam
 raspicam: opencv
