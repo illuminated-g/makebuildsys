@@ -1,15 +1,23 @@
 #AVR_MCU is used for specifying the controller for avr-gcc calls
-AVR_MCU= atmega2560
+AVR_MCU= atmega328p
+AVR_FCPU= 16000000ul
 
 #The AVRDUDE_* variables configure how avrdude is run
+AVRDUDE_PART= m328
+AVRDUDE_BITC= 10
 AVRDUDE_BAUD= 115200
-AVRDUDE_PORT= /dev/ttyACM0
-AVRDUDE_PRG= stk500v2
-AVRDUDE_PART= m2560
+
+#Following AVRDUDE_XXXX values would be typical for using the bootloader
+#AVRDUDE_PORT= /dev/ttyACM0
+#AVRDUDE_PRG= stk500v2
+
+#Parameters for using the AVR Dragon
+AVRDUDE_PRG= dragon_isp
+AVRDUDE_PORT= usb
 
 #These flags override the normal flags and ensure a properly compile AVR hex
-CXXFLAGS= -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -MMD -mmcu=$(AVR_MCU)
-CFLAGS= -Wall
+CXXFLAGS= -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -MMD -mmcu=$(AVR_MCU) -D F_CPU=$(AVR_FCPU)
+CFLAGS= -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -MMD -mmcu=$(AVR_MCU) -D F_CPU=$(AVR_FCPU)
 LDFLAGS= -Os -Wl,--gc-sections,--relax -mmcu=$(AVR_MCU) -lm
 HEXFLAGS= -R .eeprom -O ihex
 
@@ -32,7 +40,7 @@ endef
 
 define avrdude
 	@echo "    UPLOAD $(notdir $^)"
-	$(quiet) $(AVRDUDE) -b$(AVRDUDE_BAUD) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PRG) -p $(AVRDUDE_PART) -U flash:w:$(BIN_DIR)/$(notdir $^)
+	$(quiet) $(AVRDUDE) -P $(AVRDUDE_PORT) -B $(AVRDUDE_BITC) -b $(AVRDUDE_BAUD) -c $(AVRDUDE_PRG) -p $(AVRDUDE_PART) -U flash:w:$(BIN_DIR)/$(notdir $^)
 endef
 
 %.hex: %.o
@@ -40,5 +48,3 @@ endef
 
 up-%: %
 	$(avrdude)
-
-%.hex: %.cpp

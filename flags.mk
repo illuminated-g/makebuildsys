@@ -22,6 +22,5 @@ opencv: CXXFLAGS += $(shell pkg-config opencv --cflags)
 opencv: LDFLAGS += $(shell pkg-config opencv --libs)
 
 .PHONY: raspicam
-raspicam: opencv
 raspicam: CXXFLAGS += -I/usr/local/include
 raspicam: LDFLAGS += -L/usr/local/lib -lraspicam_cv -lraspicam
